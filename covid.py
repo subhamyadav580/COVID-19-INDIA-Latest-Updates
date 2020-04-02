@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 page = requests.get('https://www.mohfw.gov.in/')
 html = BeautifulSoup(page.content, 'html.parser')
@@ -79,9 +81,6 @@ for column in state_wise_covid_update:
         columnSeriesObj = state_wise_covid_update[column]
         total_death = columnSeriesObj.values
         total_death = sum(list(map(int, total_death)))
-    elif column == 'Name of State / UT':
-        columnSeriesObj = state_wise_covid_update[column]
-        state = columnSeriesObj.values
 
 
 #Adding total of each column in Dataframe
@@ -96,3 +95,24 @@ latest_covid_update.to_csv(file_to_save, index=False)
 file_to_save = 'COVID-19-INDIA-State-Wise-Updates.csv'
 state_wise_covid_update.to_csv(file_to_save, index=False)
 
+
+for column in plotting_states_data:
+    if column == 'Total Confirmed cases (Including 51 foreign Nationals)':
+        columnSeriesObj = plotting_states_data[column]
+        cases1 = columnSeriesObj.values
+        cases1 = list(map(int, cases1))
+    elif column == 'Name of State / UT':
+        columnSeriesObj = plotting_states_data[column]
+        state = columnSeriesObj.values
+        state = list(map(str, state))
+
+
+#Plotting the state data of no. of confirmed cases
+sns.set(rc={'figure.figsize': (11, 9)})
+plt.plot(state, cases1, 'go--')
+plt.xticks(rotation='90', fontsize=15)
+plt.ylabel('Total Confirmed cases (Including 51 foreign Nationals)', fontsize=15)
+plt.xlabel('Name of State / UT', fontsize=15)
+plt.title('Covid-Confirmed-Cases', fontsize=20)
+plt.savefig('State-Wise-Data.png')
+plt.show()
